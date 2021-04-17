@@ -1,3 +1,6 @@
+import time
+
+
 def show_GameBoard(matrix):
     for row in matrix:
         print(row)
@@ -32,25 +35,11 @@ def number_of_collisions_full(matrix, row, column):
         if matrix[i][column] == 1:
             collisions += 1
 
-    for i, j in zip(range(row, -1, -1),
-                    range(column, -1, -1)):
-        if matrix[i][j] == 1:
-            collisions += 1
-
-    for i, j in zip(range(row, len(matrix), 1),
-                    range(column, -1, -1)):
-        if matrix[i][j] == 1:
-            collisions += 1
-
-    for i, j in zip(range(row, -1, 1),
-                    range(column, -1, 1)):
-        if matrix[i][j] == 1:
-            collisions += 1
-
-    for i, j in zip(range(row, len(matrix), -1),
-                    range(column, -1, 1)):
-        if matrix[i][j] == 1:
-            collisions += 1
+    for k in range(0, len(matrix)):
+        for l in range(0, len(matrix)):
+            if (k + l == row + column) or (k - l == row - column):
+                if matrix[k][l] == 1:
+                    collisions += 1
 
     return collisions
 
@@ -58,7 +47,7 @@ def number_of_collisions_full(matrix, row, column):
 def numberOfFreePositions(board, column):
     free_pos = 0
     for i in range(0, len(board)):
-        if number_of_collisions(board, i, column) == 0:
+        if number_of_collisions_full(board, i, column) == 0:
             free_pos += 1
     return free_pos
 
@@ -68,7 +57,7 @@ def colMinFree(board, list_of_cols):
     min_free_col = None
     for item in list_of_cols:
         free_pos = numberOfFreePositions(board, item)
-        if free_pos <= min_free:
+        if free_pos < min_free:
             min_free = free_pos
             min_free_col = item
     return min_free_col, min_free
@@ -88,21 +77,17 @@ def backtrackSolver(board, col):
 
 
 def backtrackMRVSolver(board, col, col_list):
-
     for i in range(len(board)):
         if number_of_collisions_full(board, i, col) == 0:
             board[i][col] = 1
-            col_list.remove(col)
             if not col_list:
                 return True
-
-            col, min_free_pos = colMinFree(board, col_list.copy())
-            if min_free_pos == 0:
-                board[i][col] = 0
-                return False
-
-            if backtrackMRVSolver(board, col, col_list.copy()):
-                return True
+            new_list = col_list.copy()
+            new_col, min_free_pos = colMinFree(board, new_list)
+            if min_free_pos != 0:
+                new_list.remove(new_col)
+                if backtrackMRVSolver(board, new_col, new_list):
+                    return True
             board[i][col] = 0
     return False
 
@@ -111,17 +96,25 @@ def backtrackMRVSolver(board, col, col_list):
 n = int(input("Please Enter the size of Game board you wanna have: "))
 game_board = [[0 for _ in range(n)] for _ in range(n)]
 
+tic = time.time()
 # Simple bactrack
 if not backtrackSolver(game_board, 0):
     print("Could not find any possible solution!")
 else:
     show_GameBoard(game_board)
+toc = time.time()
+print("Time for simple backtracking: " + str(toc - tic))
+
 print('----------------------')
 
+# Initializing The Board
 game_board = [[0 for _ in range(n)] for _ in range(n)]
 
+tic = time.time()
 # MRV-backtrack
-if not backtrackMRVSolver(game_board, 0, [i for i in range(len(game_board))]):
+if not backtrackMRVSolver(game_board, 0, [i for i in range(1, len(game_board))]):
     print("Could not find any possible solution!")
 else:
     show_GameBoard(game_board)
+toc = time.time()
+print("Time for MRV backtracking: " + str(toc - tic))
