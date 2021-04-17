@@ -71,7 +71,7 @@ def colMinFree(board, list_of_cols):
         if free_pos <= min_free:
             min_free = free_pos
             min_free_col = item
-    return min_free_col
+    return min_free_col, min_free
 
 
 def backtrackSolver(board, col):
@@ -88,12 +88,20 @@ def backtrackSolver(board, col):
 
 
 def backtrackMRVSolver(board, col, col_list):
-    if len(col_list) == 0:
-        return True
+
     for i in range(len(board)):
         if number_of_collisions_full(board, i, col) == 0:
             board[i][col] = 1
-            if backtrackMRVSolver(board, col + 1, col_list):
+            col_list.remove(col)
+            if not col_list:
+                return True
+
+            col, min_free_pos = colMinFree(board, col_list.copy())
+            if min_free_pos == 0:
+                board[i][col] = 0
+                return False
+
+            if backtrackMRVSolver(board, col, col_list.copy()):
                 return True
             board[i][col] = 0
     return False
@@ -108,10 +116,12 @@ if not backtrackSolver(game_board, 0):
     print("Could not find any possible solution!")
 else:
     show_GameBoard(game_board)
+print('----------------------')
+
+game_board = [[0 for _ in range(n)] for _ in range(n)]
 
 # MRV-backtrack
 if not backtrackMRVSolver(game_board, 0, [i for i in range(len(game_board))]):
     print("Could not find any possible solution!")
 else:
     show_GameBoard(game_board)
-
