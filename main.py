@@ -1,4 +1,6 @@
 import time
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 def show_GameBoard(matrix):
@@ -118,3 +120,36 @@ else:
     show_GameBoard(game_board)
 toc = time.time()
 print("Time for MRV backtracking: " + str(toc - tic))
+'''
+x = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+y1 = []
+y2 = []
+for num in x:
+    game_board = [[0 for _ in range(num)] for _ in range(num)]
+    tic = time.time()
+    # Simple bactrack
+    if not backtrackSolver(game_board, 0):
+        print("Could not find any possible solution!")
+    else:
+        show_GameBoard(game_board)
+    toc = time.time()
+    y1.append(toc - tic)
+
+    game_board = [[0 for _ in range(num)] for _ in range(num)]
+    tic = time.time()
+    # MRV-backtrack
+    if not backtrackMRVSolver(game_board, 0, [i for i in range(1, len(game_board))]):
+        print("Could not find any possible solution!")
+    else:
+        show_GameBoard(game_board)
+    toc = time.time()
+    y2.append(toc - tic)
+
+plt.plot(x, y1, label="Simple Backtrack")
+plt.plot(x, y2, label="MRV + Backtracking")
+plt.xlabel('Size of the board')
+plt.ylabel('Solving time')
+plt.title('Comparison Between Backtrack and MRV+Backtrack in Different Boards.')
+plt.legend()
+plt.show()
+'''
